@@ -11,12 +11,14 @@ const KEY_ENTRIES = 'wt_entries';
 let config = loadJSON(KEY_CONFIG, { height: null, initialWeight: null, goalWeight: null });
 let entries = loadJSON(KEY_ENTRIES, []);  // [{ date, weight, note }]
 let chart = null;
+let currentTheme = localStorage.getItem('wt_theme') || 'dark'; // 'dark' ou 'light'
 
 // ── DOM refs ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   setHeaderDate();
   setDefaultDate();
   loadConfigToForm();
@@ -25,7 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btnSaveConfig').addEventListener('click', saveConfig);
   $('btnAddEntry').addEventListener('click', addEntry);
   $('btnClearAll').addEventListener('click', clearAll);
+  $('themeToggle').addEventListener('click', toggleTheme);
 });
+
+// ── Theme logic ───────────────────────────────────────────────
+function initTheme() {
+  document.body.classList.toggle('light-theme', currentTheme === 'light');
+}
+
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.body.classList.toggle('light-theme', currentTheme === 'light');
+  localStorage.setItem('wt_theme', currentTheme);
+  render(); // Re-render to update chart colors
+}
 
 // ── Date helpers ──────────────────────────────────────────────
 function setHeaderDate() {
@@ -63,11 +78,11 @@ function saveConfig() {
   if (!h || h < 100 || h > 250) { showAlert('Altura inválida (100–250 cm)', 'error'); return; }
   if (!iw || iw < 30) { showAlert('Peso inicial inválido', 'error'); return; }
   if (!gw || gw < 30) { showAlert('Peso meta inválido', 'error'); return; }
-  if (gw >= iw) { showAlert('O peso meta deve ser menor que o peso inicial 😅', 'error'); return; }
+  if (gw >= iw) { showAlert('O peso meta deve ser menor que o peso inicial', 'error'); return; }
 
   config = { height: h, initialWeight: iw, goalWeight: gw };
   saveJSON(KEY_CONFIG, config);
-  showAlert('✅ Configurações salvas!', 'success');
+  showAlert('Configurações salvas!', 'success');
   render();
 }
 
@@ -87,7 +102,7 @@ function addEntry() {
 
   $('inputWeight').value = '';
   $('inputNote').value = '';
-  showAlert('✅ Registro adicionado!', 'success');
+  showAlert('Registro adicionado!', 'success');
   render();
 }
 
@@ -246,14 +261,14 @@ function updateChart(hasEntries) {
       interaction: { intersect: false, mode: 'index' },
       plugins: {
         legend: {
-          labels: { color: '#52525b', font: { family: 'Inter', size: 11 }, boxWidth: 12, boxHeight: 2 }
+          labels: { color: currentTheme === 'dark' ? '#71717a' : '#9ca3af', font: { family: 'Montserrat', size: 10, weight: '600' }, boxWidth: 10, boxHeight: 2 }
         },
         tooltip: {
-          backgroundColor: '#1c1c1c',
-          borderColor: '#3e3e3e',
+          backgroundColor: currentTheme === 'dark' ? '#171717' : '#ffffff',
+          borderColor: currentTheme === 'dark' ? '#303030' : '#e0e0e0',
           borderWidth: 1,
-          titleColor: '#ededed',
-          bodyColor: '#a1a1aa',
+          titleColor: currentTheme === 'dark' ? '#fcfcfc' : '#171717',
+          bodyColor: currentTheme === 'dark' ? '#a1a1aa' : '#4b5563',
           padding: 10,
           cornerRadius: 4,
           callbacks: {
@@ -263,16 +278,16 @@ function updateChart(hasEntries) {
       },
       scales: {
         x: {
-          grid: { color: '#2a2a2a', drawBorder: false },
-          ticks: { color: '#52525b', font: { family: 'Inter', size: 11 } }
+          grid: { color: currentTheme === 'dark' ? '#262626' : '#eeeeee', drawBorder: false },
+          ticks: { color: currentTheme === 'dark' ? '#71717a' : '#9ca3af', font: { family: 'Montserrat', size: 10 } }
         },
         y: {
           min: minW,
           max: maxW,
-          grid: { color: '#2a2a2a', drawBorder: false },
+          grid: { color: currentTheme === 'dark' ? '#262626' : '#eeeeee', drawBorder: false },
           ticks: {
-            color: '#52525b',
-            font: { family: 'Inter', size: 11 },
+            color: currentTheme === 'dark' ? '#71717a' : '#9ca3af',
+            font: { family: 'Montserrat', size: 10 },
             callback: v => v.toFixed(1) + ' kg'
           }
         }
@@ -321,7 +336,7 @@ function updateHistory(hasEntries) {
       <td>${bmiHtml}</td>
       <td>${noteHtml}</td>
       <td>
-        <button class="btn-icon" title="Apagar" onclick="deleteEntry('${entry.date}')">🗑️</button>
+        <button class="btn-icon" title="Apagar" onclick="deleteEntry('${entry.date}')">Deletar</button>
       </td>
     `;
     tbody.appendChild(tr);
