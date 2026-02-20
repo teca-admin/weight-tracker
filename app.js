@@ -4,13 +4,13 @@
    ============================================================ */
 
 // ── Storage keys ──────────────────────────────────────────────
-const KEY_CONFIG  = 'wt_config';
+const KEY_CONFIG = 'wt_config';
 const KEY_ENTRIES = 'wt_entries';
 
 // ── State ─────────────────────────────────────────────────────
-let config  = loadJSON(KEY_CONFIG,  { height: null, initialWeight: null, goalWeight: null });
+let config = loadJSON(KEY_CONFIG, { height: null, initialWeight: null, goalWeight: null });
 let entries = loadJSON(KEY_ENTRIES, []);  // [{ date, weight, note }]
-let chart   = null;
+let chart = null;
 
 // ── DOM refs ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -36,9 +36,9 @@ function setHeaderDate() {
 
 function setDefaultDate() {
   const today = new Date();
-  const yyyy  = today.getFullYear();
-  const mm    = String(today.getMonth() + 1).padStart(2, '0');
-  const dd    = String(today.getDate()).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
   $('inputDate').value = `${yyyy}-${mm}-${dd}`;
 }
 
@@ -50,20 +50,20 @@ function formatDate(dateStr) {
 
 // ── Config ────────────────────────────────────────────────────
 function loadConfigToForm() {
-  if (config.height)         $('inputHeight').value        = config.height;
-  if (config.initialWeight)  $('inputInitialWeight').value = config.initialWeight;
-  if (config.goalWeight)     $('inputGoalWeight').value    = config.goalWeight;
+  if (config.height) $('inputHeight').value = config.height;
+  if (config.initialWeight) $('inputInitialWeight').value = config.initialWeight;
+  if (config.goalWeight) $('inputGoalWeight').value = config.goalWeight;
 }
 
 function saveConfig() {
-  const h  = parseFloat($('inputHeight').value);
+  const h = parseFloat($('inputHeight').value);
   const iw = parseFloat($('inputInitialWeight').value);
   const gw = parseFloat($('inputGoalWeight').value);
 
   if (!h || h < 100 || h > 250) { showAlert('Altura inválida (100–250 cm)', 'error'); return; }
-  if (!iw || iw < 30)            { showAlert('Peso inicial inválido', 'error'); return; }
-  if (!gw || gw < 30)            { showAlert('Peso meta inválido', 'error'); return; }
-  if (gw >= iw)                  { showAlert('O peso meta deve ser menor que o peso inicial 😅', 'error'); return; }
+  if (!iw || iw < 30) { showAlert('Peso inicial inválido', 'error'); return; }
+  if (!gw || gw < 30) { showAlert('Peso meta inválido', 'error'); return; }
+  if (gw >= iw) { showAlert('O peso meta deve ser menor que o peso inicial 😅', 'error'); return; }
 
   config = { height: h, initialWeight: iw, goalWeight: gw };
   saveJSON(KEY_CONFIG, config);
@@ -74,19 +74,19 @@ function saveConfig() {
 // ── Entries ───────────────────────────────────────────────────
 function addEntry() {
   const weight = parseFloat($('inputWeight').value);
-  const date   = $('inputDate').value.trim();
-  const note   = $('inputNote').value.trim();
+  const date = $('inputDate').value.trim();
+  const note = $('inputNote').value.trim();
 
   if (!weight || weight < 30 || weight > 300) { showAlert('Peso inválido (30–300 kg)', 'error'); return; }
-  if (!date)                                   { showAlert('Selecione uma data', 'error'); return; }
-  if (entries.some(e => e.date === date))      { showAlert('Já existe um registro para essa data. Delete o antigo primeiro.', 'error'); return; }
+  if (!date) { showAlert('Selecione uma data', 'error'); return; }
+  if (entries.some(e => e.date === date)) { showAlert('Já existe um registro para essa data. Delete o antigo primeiro.', 'error'); return; }
 
   entries.push({ date, weight, note });
   entries.sort((a, b) => a.date.localeCompare(b.date));
   saveJSON(KEY_ENTRIES, entries);
 
   $('inputWeight').value = '';
-  $('inputNote').value   = '';
+  $('inputNote').value = '';
   showAlert('✅ Registro adicionado!', 'success');
   render();
 }
@@ -113,14 +113,14 @@ function calcBMI(weight) {
 
 function bmiLabel(bmi) {
   if (bmi < 18.5) return { label: 'Abaixo do peso', cls: 'bmi-under' };
-  if (bmi < 25)   return { label: 'Normal',         cls: 'bmi-normal' };
-  if (bmi < 30)   return { label: 'Sobrepeso',      cls: 'bmi-over'   };
-                  return { label: 'Obesidade',       cls: 'bmi-obese'  };
+  if (bmi < 25) return { label: 'Normal', cls: 'bmi-normal' };
+  if (bmi < 30) return { label: 'Sobrepeso', cls: 'bmi-over' };
+  return { label: 'Obesidade', cls: 'bmi-obese' };
 }
 
 // ── Render ────────────────────────────────────────────────────
 function render() {
-  const hasConfig  = config.initialWeight && config.goalWeight && config.height;
+  const hasConfig = config.initialWeight && config.goalWeight && config.height;
   const hasEntries = entries.length > 0;
 
   updateStats(hasConfig, hasEntries);
@@ -136,7 +136,7 @@ function updateStats(hasConfig, hasEntries) {
   const current = hasEntries ? entries[entries.length - 1].weight : null;
 
   $('statCurrentWeight').textContent = current !== null ? current.toFixed(1) : '—';
-  $('statGoalWeight').textContent    = hasConfig ? gw.toFixed(1) : '—';
+  $('statGoalWeight').textContent = hasConfig ? gw.toFixed(1) : '—';
 
   if (current !== null && iw) {
     const lost = iw - current;
@@ -148,25 +148,25 @@ function updateStats(hasConfig, hasEntries) {
   if (current !== null && config.height) {
     const bmi = calcBMI(current);
     const info = bmiLabel(bmi);
-    $('statBMI').textContent      = bmi.toFixed(1);
+    $('statBMI').textContent = bmi.toFixed(1);
     $('statBMILabel').textContent = info.label;
-    $('statBMI').className        = 'card-value ' + info.cls;
+    $('statBMI').className = 'card-value ' + info.cls;
   } else {
-    $('statBMI').textContent      = '—';
+    $('statBMI').textContent = '—';
     $('statBMILabel').textContent = '';
-    $('statBMI').className        = 'card-value';
+    $('statBMI').className = 'card-value';
   }
 
   if (current !== null && hasConfig) {
     const remaining = current - gw;
     $('statRemaining').textContent = (remaining > 0 ? remaining : 0).toFixed(1);
-    const total    = iw - gw;
-    const done     = iw - current;
-    const pct      = Math.min(100, Math.max(0, (done / total) * 100));
+    const total = iw - gw;
+    const done = iw - current;
+    const pct = Math.min(100, Math.max(0, (done / total) * 100));
     $('statProgress').textContent = pct.toFixed(0);
   } else {
     $('statRemaining').textContent = '—';
-    $('statProgress').textContent  = '—';
+    $('statProgress').textContent = '—';
   }
 }
 
@@ -179,14 +179,14 @@ function updateProgress(hasConfig, hasEntries) {
   const current = entries[entries.length - 1].weight;
 
   const total = iw - gw;
-  const done  = iw - current;
-  const pct   = Math.min(100, Math.max(0, (done / total) * 100));
+  const done = iw - current;
+  const pct = Math.min(100, Math.max(0, (done / total) * 100));
 
   section.style.display = '';
-  $('progressPct').textContent  = pct.toFixed(0) + '%';
+  $('progressPct').textContent = pct.toFixed(0) + '%';
   $('progressBarFill').style.width = pct.toFixed(1) + '%';
   $('progressStart').textContent = iw.toFixed(1) + ' kg';
-  $('progressEnd').textContent   = gw.toFixed(1) + ' kg';
+  $('progressEnd').textContent = gw.toFixed(1) + ' kg';
 }
 
 function updateChart(hasEntries) {
@@ -194,7 +194,7 @@ function updateChart(hasEntries) {
   if (!hasEntries) { section.style.display = 'none'; chart && chart.destroy(); return; }
   section.style.display = '';
 
-  const labels  = entries.map(e => formatDate(e.date));
+  const labels = entries.map(e => formatDate(e.date));
   const weights = entries.map(e => e.weight);
 
   const minW = Math.min(...weights) - 2;
@@ -205,21 +205,21 @@ function updateChart(hasEntries) {
     {
       label: 'Peso (kg)',
       data: weights,
-      borderColor: '#8b5cf6',
+      borderColor: '#3ecf8e',
       backgroundColor: ctx => {
         const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
-        gradient.addColorStop(0, 'rgba(139,92,246,0.35)');
-        gradient.addColorStop(1, 'rgba(139,92,246,0)');
+        gradient.addColorStop(0, 'rgba(62,207,142,0.18)');
+        gradient.addColorStop(1, 'rgba(62,207,142,0)');
         return gradient;
       },
-      borderWidth: 3,
-      pointBackgroundColor: '#8b5cf6',
-      pointBorderColor: '#fff',
+      borderWidth: 2,
+      pointBackgroundColor: '#3ecf8e',
+      pointBorderColor: '#1c1c1c',
       pointBorderWidth: 2,
-      pointRadius: 5,
-      pointHoverRadius: 8,
+      pointRadius: 4,
+      pointHoverRadius: 6,
       fill: true,
-      tension: 0.4,
+      tension: 0.3,
     }
   ];
 
@@ -227,9 +227,9 @@ function updateChart(hasEntries) {
     datasets.push({
       label: 'Meta',
       data: weights.map(() => config.goalWeight),
-      borderColor: 'rgba(16,185,129,0.7)',
-      borderDash: [8, 4],
-      borderWidth: 2,
+      borderColor: 'rgba(62,207,142,0.35)',
+      borderDash: [6, 4],
+      borderWidth: 1,
       pointRadius: 0,
       fill: false,
     });
@@ -246,15 +246,16 @@ function updateChart(hasEntries) {
       interaction: { intersect: false, mode: 'index' },
       plugins: {
         legend: {
-          labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, boxWidth: 20 }
+          labels: { color: '#52525b', font: { family: 'Inter', size: 11 }, boxWidth: 12, boxHeight: 2 }
         },
         tooltip: {
-          backgroundColor: '#1e1b4b',
-          borderColor: 'rgba(139,92,246,0.4)',
+          backgroundColor: '#1c1c1c',
+          borderColor: '#3e3e3e',
           borderWidth: 1,
-          titleColor: '#f1f5f9',
-          bodyColor: '#94a3b8',
-          padding: 12,
+          titleColor: '#ededed',
+          bodyColor: '#a1a1aa',
+          padding: 10,
+          cornerRadius: 4,
           callbacks: {
             label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + ' kg'
           }
@@ -262,15 +263,15 @@ function updateChart(hasEntries) {
       },
       scales: {
         x: {
-          grid: { color: 'rgba(255,255,255,0.05)' },
-          ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+          grid: { color: '#2a2a2a', drawBorder: false },
+          ticks: { color: '#52525b', font: { family: 'Inter', size: 11 } }
         },
         y: {
           min: minW,
           max: maxW,
-          grid: { color: 'rgba(255,255,255,0.05)' },
+          grid: { color: '#2a2a2a', drawBorder: false },
           ticks: {
-            color: '#94a3b8',
+            color: '#52525b',
             font: { family: 'Inter', size: 11 },
             callback: v => v.toFixed(1) + ' kg'
           }
@@ -297,13 +298,13 @@ function updateHistory(hasEntries) {
     let diffHtml = '<span class="badge-same">—</span>';
     if (diff !== null) {
       const sign = diff > 0 ? '+' : '';
-      const cls  = diff < 0 ? 'badge-loss' : diff > 0 ? 'badge-gain' : 'badge-same';
+      const cls = diff < 0 ? 'badge-loss' : diff > 0 ? 'badge-gain' : 'badge-same';
       diffHtml = `<span class="${cls}">${sign}${diff.toFixed(1)} kg</span>`;
     }
 
     let bmiHtml = '—';
     if (config.height) {
-      const bmi  = calcBMI(entry.weight);
+      const bmi = calcBMI(entry.weight);
       const info = bmiLabel(bmi);
       bmiHtml = `<span class="${info.cls}">${bmi.toFixed(1)}</span>`;
     }
@@ -332,7 +333,7 @@ let alertTimer;
 function showAlert(msg, type = 'success') {
   const el = $('alert');
   el.textContent = msg;
-  el.className   = `alert alert-${type}`;
+  el.className = `alert alert-${type}`;
   el.style.display = '';
   clearTimeout(alertTimer);
   alertTimer = setTimeout(() => { el.style.display = 'none'; }, 3500);
@@ -347,5 +348,5 @@ function saveJSON(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
