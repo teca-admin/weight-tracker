@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeightTrack — Acompanhamento de Emagrecimento</title>
+  <meta name="description" content="Sistema pessoal de acompanhamento de emagrecimento com gráficos e estatísticas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏃</span>
+        <div>
+          <h1 class="logo-title">WeightTrack</h1>
+          <p class="logo-sub">Sua jornada de emagrecimento</p>
+        </div>
+      </div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- STATS CARDS -->
+    <section class="cards-grid" id="statsSection">
+      <div class="card card-accent" id="cardCurrent">
+        <div class="card-icon">⚖️</div>
+        <div class="card-info">
+          <span class="card-label">Peso Atual</span>
+          <span class="card-value" id="statCurrentWeight">—</span>
+          <span class="card-unit">kg</span>
+        </div>
+      </div>
+      <div class="card" id="cardGoal">
+        <div class="card-icon">🎯</div>
+        <div class="card-info">
+          <span class="card-label">Meta</span>
+          <span class="card-value" id="statGoalWeight">—</span>
+          <span class="card-unit">kg</span>
+        </div>
+      </div>
+      <div class="card" id="cardLost">
+        <div class="card-icon">🔥</div>
+        <div class="card-info">
+          <span class="card-label">Total Perdido</span>
+          <span class="card-value" id="statLost">—</span>
+          <span class="card-unit">kg</span>
+        </div>
+      </div>
+      <div class="card" id="cardBMI">
+        <div class="card-icon">💪</div>
+        <div class="card-info">
+          <span class="card-label">IMC</span>
+          <span class="card-value" id="statBMI">—</span>
+          <span class="card-unit" id="statBMILabel"></span>
+        </div>
+      </div>
+      <div class="card" id="cardRemaining">
+        <div class="card-icon">📉</div>
+        <div class="card-info">
+          <span class="card-label">Faltam</span>
+          <span class="card-value" id="statRemaining">—</span>
+          <span class="card-unit">kg para meta</span>
+        </div>
+      </div>
+      <div class="card" id="cardProgress">
+        <div class="card-icon">🏅</div>
+        <div class="card-info">
+          <span class="card-label">Progresso</span>
+          <span class="card-value" id="statProgress">—</span>
+          <span class="card-unit">% concluído</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="progress-section glass-card" id="progressSection" style="display:none">
+      <div class="progress-header">
+        <span class="progress-label">Progresso rumo à meta</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="progress-range">
+        <span id="progressStart">—</span>
+        <span id="progressEnd">—</span>
+      </div>
+    </section>
+
+    <!-- CONFIG SECTION -->
+    <section class="glass-card" id="configSection">
+      <h2 class="section-title">⚙️ Configurações</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="inputHeight">Altura (cm)</label>
+          <input type="number" id="inputHeight" placeholder="Ex: 175" min="100" max="250" />
+        </div>
+        <div class="form-group">
+          <label for="inputInitialWeight">Peso Inicial (kg)</label>
+          <input type="number" id="inputInitialWeight" placeholder="Ex: 95.0" min="30" max="300" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="inputGoalWeight">Peso Meta (kg)</label>
+          <input type="number" id="inputGoalWeight" placeholder="Ex: 75.0" min="30" max="300" step="0.1" />
+        </div>
+        <div class="form-group form-group-btn">
+          <button class="btn btn-secondary" id="btnSaveConfig">💾 Salvar Configurações</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTER WEIGHT -->
+    <section class="glass-card">
+      <h2 class="section-title">➕ Registrar Peso</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="inputWeight">Peso (kg)</label>
+          <input type="number" id="inputWeight" placeholder="Ex: 88.5" min="30" max="300" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="inputDate">Data</label>
+          <input type="date" id="inputDate" />
+        </div>
+        <div class="form-group form-group-wide">
+          <label for="inputNote">Observações (opcional)</label>
+          <input type="text" id="inputNote" placeholder="Ex: Após treino, dia de folga..." maxlength="120" />
+        </div>
+        <div class="form-group form-group-btn">
+          <button class="btn btn-primary" id="btnAddEntry">🏋️ Registrar</button>
+        </div>
+      </div>
+      <div class="alert" id="alert" style="display:none"></div>
+    </section>
+
+    <!-- CHART -->
+    <section class="glass-card" id="chartSection" style="display:none">
+      <h2 class="section-title">📈 Evolução do Peso</h2>
+      <div class="chart-wrapper">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </section>
+
+    <!-- HISTORY TABLE -->
+    <section class="glass-card" id="historySection" style="display:none">
+      <div class="history-header">
+        <h2 class="section-title">📋 Histórico</h2>
+        <button class="btn btn-danger-sm" id="btnClearAll">🗑️ Limpar tudo</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="history-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Peso</th>
+              <th>Variação</th>
+              <th>IMC</th>
+              <th>Observação</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EMPTY STATE -->
+    <section class="empty-state" id="emptyState">
+      <div class="empty-icon">📊</div>
+      <h3>Nenhum registro ainda</h3>
+      <p>Configure sua altura, peso inicial e meta acima, depois comece a registrar seus pesagens!</p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>WeightTrack &mdash; Seus dados ficam apenas no seu dispositivo 🔒</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
