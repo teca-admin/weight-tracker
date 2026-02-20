@@ -220,11 +220,13 @@ body.light-theme .theme-icon-dark {
 
 .card {
   background: var(--bg-surface);
-  padding: 1.5rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 0.25rem;
   transition: var(--trans);
+  min-height: 100px;
 }
 
 .card:hover {
@@ -235,27 +237,47 @@ body.light-theme .theme-icon-dark {
   background: var(--bg-raised);
 }
 
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
 .card-label {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
+  margin-bottom: 0.1rem;
+}
+
+.card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
 }
 
 .card-value {
   font-size: 1.75rem;
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.1;
   color: var(--text);
   font-family: var(--font-mono);
   letter-spacing: -0.03em;
 }
 
 .card-unit {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--text-m);
-  margin-top: -0.2rem;
+  font-weight: 600;
+}
+
+.card-subtext {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  margin-top: 0.1rem;
 }
 
 /* ===== PROGRESS ===== */
